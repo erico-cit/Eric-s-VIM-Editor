@@ -58,6 +58,26 @@
     if (enabled && engine) activate(record);
   }
 
+  function ensureContextKeyApi(editor) {
+    if (typeof editor.createContextKey === "function") return;
+
+    // VS Code workbench editors omit Monaco's public context-key helper.
+    // monaco-vim only uses this key internally to track insert mode, so a
+    // local value object is sufficient and does not alter workbench bindings.
+    let value = true;
+    Object.defineProperty(editor, "createContextKey", {
+      configurable: true,
+      value(_key, defaultValue) {
+        value = defaultValue;
+        return {
+          set(nextValue) { value = nextValue; },
+          reset() { value = defaultValue; },
+          get() { return value; },
+        };
+      },
+    });
+  }
+
   function activate(record) {
     if (!enabled || !engine || record.vim) return;
     // Register before monaco-vim so browser refresh is cancelled and Ctrl+R
@@ -73,6 +93,7 @@
       }
     });
     try {
+      ensureContextKeyApi(record.editor);
       record.vim = engine.initVimMode(record.editor);
       record.vim.on("vim-mode-change", (state) => {
         const mode = state?.mode || "normal";
@@ -108,6 +129,17 @@
 
   function loadEngine() {
     if (!window.__monacoVimEngineDefined || engineLoading || engine) return;
+    // Some VS Code workbenches expose Monaco's public API without an AMD loader.
+    // The bundled UMD engine can use that global API directly.
+    if (window.MonacoVim?.initVimMode) {
+      engine = window.MonacoVim;
+      loadError = "";
+      patch();
+      scan();
+      for (const record of editors.values()) if (enabled) activate(record);
+      publishStatus();
+      return;
+    }
     const req = window.require;
     // Monaco's AMDLoader exposes define.amd, while require.amd is absent on
     // some VS Code/Monaco loader builds (including Rewst's saved page).
@@ -163,6 +195,8 @@
     if (engine || loadError || !window.monaco?.editor) return;
     loadError = !window.__monacoVimEngineDefined
       ? "Vim engine is waiting for the page's AMD loader."
+      : window.monaco?.editor && window.MonacoVim?.initVimMode
+        ? ""
       : typeof window.require !== "function" || !(window.require.amd || window.define?.amd)
         ? "Monaco AMD require/define was not found."
         : "Monaco Vim did not finish loading; reload the page and check the extension files.";

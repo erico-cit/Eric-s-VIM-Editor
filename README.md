@@ -1,24 +1,35 @@
-# Monaco Vim Mode for Edge
+# Eric's VIM Editor
 
-Unpacked Microsoft Edge extension that attaches the `monaco-vim` Vim key engine to Monaco editors. Rewst and ImmyBot are included automatically because the extension runs on all web pages.
+Browser extension that attaches the bundled `monaco-vim` key engine to Monaco editors. The shared source of truth is in `shared/`. Browser-ready packages are generated under `browsers/`:
 
-## Install
+- Edge: `browsers/edge`
+- Chrome: `browsers/chrome`
+- Firefox: `browsers/firefox`
+
+Run `./build.ps1` after changing shared files to refresh all three packages. To build just one, run `./build.ps1 -Browser edge` (or `chrome` / `firefox`). The toolbar popup toggles Vim mode for the current tab. The default shortcut is **Alt+Shift+V**; each browser lets you change it in the extension shortcut settings. Reload the target page after installation or updates.
+
+## Install in Edge
 
 1. Open `edge://extensions`.
 2. Turn on **Developer mode**.
-3. Choose **Load unpacked** and select this folder.
-4. Reload Rewst or ImmyBot after installation.
+3. Choose **Load unpacked** and select `browsers/edge`.
 
-The toolbar popup toggles Vim mode for the current tab. The default shortcut is **Alt+Shift+V**; Edge lets you change it at `edge://extensions/shortcuts`. Reload the extension and the target page after installing or updating it.
+## Install in Chrome
 
-## Vim engine
+1. Open `chrome://extensions`.
+2. Turn on **Developer mode**.
+3. Choose **Load unpacked** and select `browsers/chrome`.
 
-The extension bundles `monaco-vim` 0.4.2, which adapts CodeMirror's established Vim keymap to Monaco. This replaces the former hand-written command parser and brings composed motions and operators, counts, text objects, Visual modes, registers, dot-repeat, and Vim search/command-line behavior. It is not Neovim itself and does not load your Neovim plugins or Lua configuration. The upstream project notes that some commands which require extra input, especially Ex and search/replace, can still have edge cases.
+## Install in Firefox
 
-The adapter registers with the page's AMD loader and uses the Monaco modules already loaded by the site. This is needed for Monaco internals used by the adapter. Editors discovered through `window.monaco.editor.getEditors()` and later `editor.create()` calls are attached. A page that hides Monaco in a closed shadow root, iframe, or module scope may not be detected. Rewst's supplied page exposes Monaco 0.39 and an AMD loader; the new engine integration still needs a live check in Rewst and ImmyBot.
+1. Open `about:debugging#/runtime/this-firefox`.
+2. Choose **Load Temporary Add-on…** and select `browsers/firefox/manifest.json`.
+3. Temporary add-ons are removed when Firefox closes. For regular use or public distribution, package and sign the extension through Mozilla Add-ons.
 
-The mode badge stays outside the editor text at the bottom-right of the Monaco window and is hidden when Vim mode is off. The cursor is a block in NORMAL mode. The browser-refresh guard still prevents Ctrl+R from reloading the page; when an editor is focused, the extension sends Ctrl+R to Monaco's redo action.
+## Vim engine and editor support
 
-The bundled engine is from [brijeshb42/monaco-vim](https://github.com/brijeshb42/monaco-vim), released under MIT. The package and CodeMirror license texts are included beside the bundle.
+The extension bundles `monaco-vim` 0.4.2, which adapts CodeMirror's Vim keymap to Monaco. It supports composed motions and operators, counts, text objects, Visual modes, registers, dot-repeat, and Vim search/command-line behavior. It is not Neovim and does not load Neovim plugins or Lua configuration. Upstream notes some edge cases, especially Ex and search/replace commands.
 
-This is a first pass; test with a noncritical editor before relying on editing commands.
+On ImmyBot, a document-start preloader enables Monaco's supported `MonacoEnvironment.globalAPI` option before the VS Code workbench initializes. The bridge can then use the resulting public Monaco global without an AMD loader. This path is a best-effort compatibility change; it still needs a live ImmyBot reload and editor check before support is confirmed. Rewst and ImmyBot should be checked separately.
+
+The bundled engine is from [brijeshb42/monaco-vim](https://github.com/brijeshb42/monaco-vim), released under MIT. The `monaco-vim` and CodeMirror license texts are included in each package.
