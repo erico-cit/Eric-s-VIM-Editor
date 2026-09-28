@@ -1,0 +1,20 @@
+{
+  "manifest_version": 3,
+  "name": "Monaco Vim Mode",
+  "version": "1.1.0",
+  "description": "Toggle Vim keybindings in Monaco editors, including Rewst and ImmyBot.",
+  "permissions": ["activeTab", "storage", "scripting"],
+  "host_permissions": ["<all_urls>"],
+  "background": { "service_worker": "background.js" },
+  "action": { "default_title": "Toggle Monaco Vim", "default_popup": "popup.html" },
+  "commands": {
+    "toggle-vim": {
+      "suggested_key": { "default": "Alt+Shift+V" },
+      "description": "Toggle Vim mode in Monaco editors on this tab"
+    }
+  },
+  "content_scripts": [
+    { "matches": ["<all_urls>"], "js": ["content.js"], "run_at": "document_start", "world": "ISOLATED", "all_frames": true },
+    { "matches": ["<all_urls>"], "js": ["monaco-vim-engine.js", "page-bridge.js"], "run_at": "document_start", "world": "MAIN", "all_frames": true }
+  ]
+}
