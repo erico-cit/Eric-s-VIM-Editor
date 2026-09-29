@@ -22,11 +22,18 @@
     enabled = !!v[key];
     window.postMessage({ source: "monaco-vim-extension", type: "set", enabled }, "*");
   });
+  chrome.storage.local.get({ monacoVimLineNumbers: "on" }, ({ monacoVimLineNumbers }) => {
+    window.postMessage({ source: "monaco-vim-extension", type: "setLineNumbers", mode: monacoVimLineNumbers }, "*");
+  });
   chrome.runtime.onMessage.addListener((msg, sender, respond) => {
     if (msg.type === "status") { respond({ enabled, editors: editorCount, monaco: monacoDetected, error: engineError }); return true; }
     if (msg.type === "toggle") {
       toggle();
       respond({ enabled });
+    }
+    if (msg.type === "setLineNumbers") {
+      window.postMessage({ source: "monaco-vim-extension", type: "setLineNumbers", mode: msg.mode }, "*");
+      respond({ mode: msg.mode });
     }
   });
   // Fallback for Edge installations where the extension command is not

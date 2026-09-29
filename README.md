@@ -13,6 +13,7 @@ Run `./build.ps1` after changing shared files to refresh all three packages. To 
 1. Open `edge://extensions`.
 2. Turn on **Developer mode**.
 3. Choose **Load unpacked** and select `browsers/edge`.
+4. Leave the extension folder at a stable path. Edge keeps a locally loaded unpacked extension across browser restarts while Developer mode is enabled.
 
 ## Install in Chrome
 
@@ -22,9 +23,7 @@ Run `./build.ps1` after changing shared files to refresh all three packages. To 
 
 ## Install in Firefox
 
-1. Open `about:debugging#/runtime/this-firefox`.
-2. Choose **Load Temporary Add-on…** and select `browsers/firefox/manifest.json`.
-3. Temporary add-ons are removed when Firefox closes. For regular use or public distribution, package and sign the extension through Mozilla Add-ons.
+Firefox's **Load Temporary Add-on** option removes the extension when Firefox closes. To keep it installed without a public listing, submit the package to Mozilla Add-ons (AMO), choose **On your own** for unlisted distribution, and download the Mozilla-signed `.xpi`. In Firefox, open `about:addons`, choose **Install Add-on From File** from the gear menu, and select the signed file. Unlisted updates must be installed manually unless you set up a signed self-hosted update feed.
 
 ## Vim engine and editor support
 

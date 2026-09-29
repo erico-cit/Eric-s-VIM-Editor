@@ -4,17 +4,21 @@
   "version": "1.1.0",
   "description": "Toggle Vim keybindings in Monaco editors.",
   "icons": {
-    "16": "icons/CharlesIT_Monogram-Chicklet_Blue_RGB.png",
-    "32": "icons/CharlesIT_Monogram-Chicklet_Blue_RGB.png",
-    "48": "icons/CharlesIT_Monogram-Chicklet_Blue_RGB.png",
-    "128": "icons/CharlesIT_Monogram-Chicklet_Blue_RGB.png"
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
   },
   "permissions": ["activeTab", "storage", "scripting"],
   "host_permissions": ["<all_urls>"],
   "background": { "service_worker": "background.js" },
   "action": {
     "default_title": "Toggle Eric's VIM Editor",
-    "default_icon": "icons/CharlesIT_Monogram-Chicklet_Blue_RGB.png",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "48": "icons/icon48.png"
+    },
     "default_popup": "popup.html"
   },
   "commands": {

@@ -7,6 +7,7 @@
   let engine = null;
   let loadError = "";
   let editorCount = 0;
+  let lineNumberMode = "on";
   const editors = new Map();
 
   function publishStatus() {
@@ -54,8 +55,13 @@
     editor.getDomNode().appendChild(badge);
     const record = { editor, badge, mode: "NORMAL", originalOptions: rememberOptions(editor), vim: null, keyListener: null };
     editors.set(editor, record);
+    applyLineNumbers(record);
     editorCount = editors.size;
     if (enabled && engine) activate(record);
+  }
+
+  function applyLineNumbers(record) {
+    try { record.editor.updateOptions({ lineNumbers: lineNumberMode }); } catch (_) {}
   }
 
   function ensureContextKeyApi(editor) {
@@ -186,6 +192,10 @@
       }
       if (enabled) loadEngine();
       publishStatus();
+    }
+    if (data?.source === "monaco-vim-extension" && data.type === "setLineNumbers") {
+      lineNumberMode = data.mode === "relative" ? "relative" : "on";
+      for (const record of editors.values()) applyLineNumbers(record);
     }
   });
 
